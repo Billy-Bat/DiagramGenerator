@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch localhost",
+            "type": "chrome",
+            "request": "launch",
+            "url": "file:///Users/Liam/Desktop/SQLMEGA_WIP/Diagram_Env/Diagram.html",
+            "webRoot": "${workspaceFolder}/wwwroot"
+        },
+        {
+            "name": "Launch Diagram.html",
+            "type": "chrome",
+            "request": "launch",
+            "file": "${workspaceFolder}/Diagram.html"
+        },
+    ]
+}

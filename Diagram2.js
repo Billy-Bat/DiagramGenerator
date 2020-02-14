@@ -35,7 +35,61 @@ var example_data_r = [{
     {'table_name' : 'Company_Info',
     'table_cols' : [{'col_name' : 'CP_ID', 'd_type': 'Int', 'f_key':[], 'p_key':true},
                     {'col_name' : 'CP_name', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false}],
-    'Size_Mb' : 14
+    'Size_Mb' : 11
+
+    },
+    {'table_name' : 'Company_Trades',
+    'table_cols' : [{'col_name' : 'Trade_ID', 'd_type': 'Int', 'f_key':[], 'p_key':true},
+                    {'col_name' : 'Trade_label', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'foreign_lin', 'd_type': 'Int', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Legislation', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false}],
+    'Size_Mb' : 29
+
+    },
+    {'table_name' : 'LawSuits',
+    'table_cols' : [{'col_name' : 'LS_Id', 'd_type': 'Int', 'f_key':[], 'p_key':true},
+                    {'col_name' : 'Lawyer', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Lawyer_Id', 'd_type': 'Int', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge_id', 'd_type': 'Int', 'f_key':['Judges.Judge_Id'], 'p_key':false},
+                    {'col_name' : 'Started', 'd_type': 'Date', 'f_key':[], 'p_key':false}],
+    'Size_Mb' : 18
+    },
+    {'table_name' : 'Judges',
+    'table_cols' : [{'col_name' : 'Judge_Id', 'd_type': 'Int', 'f_key':[], 'p_key':true},
+                    {'col_name' : 'Name', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'e_mail', 'd_type': 'Int', 'f_key':[], 'p_key':false}],
+    'Size_Mb' : 18
+
+    },
+    {'table_name' : 'Incomes',
+    'table_cols' : [{'col_name' : 'LS_Id', 'd_type': 'Int', 'f_key':[], 'p_key':true},
+                    {'col_name' : 'Lawyer', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Lawyer_Id', 'd_type': 'Int', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge_id', 'd_type': 'Int', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Started', 'd_type': 'Date', 'f_key':[], 'p_key':false}],
+    'Size_Mb' : 18
+
+    },
+    {'table_name' : 'Supra',
+    'table_cols' : [{'col_name' : 'LS_Id', 'd_type': 'Int', 'f_key':[], 'p_key':true},
+                    {'col_name' : 'Lawyer', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Lawyer_Id', 'd_type': 'Int', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge_id', 'd_type': 'Int', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Started', 'd_type': 'Date', 'f_key':[], 'p_key':false}],
+    'Size_Mb' : 18
+
+    },
+    {'table_name' : 'Another',
+    'table_cols' : [{'col_name' : 'LS_Id', 'd_type': 'Int', 'f_key':[], 'p_key':true},
+                    {'col_name' : 'Lawyer', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Lawyer_Id', 'd_type': 'Int', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge', 'd_type': 'VARCHAR', 'f_key':[], 'p_key':false},
+                    {'col_name' : 'Judge_id', 'd_type': 'Int', 'f_key':['Judges.Judge_Id'], 'p_key':false},
+                    {'col_name' : 'Started', 'd_type': 'Date', 'f_key':[], 'p_key':false}],
+    'Size_Mb' : 18
 
     }
 ];
@@ -55,7 +109,7 @@ var col_height = 20;
 var type_textoffset = 70;
 // Zoom Variables
 var zoom = d3.zoom()
-    .on("zoom", panned);
+    .on("zoom", panned);;
     
 function panned() {
     // Only pan for now add a slider for the zoom
@@ -77,9 +131,10 @@ var svg = d3.select("#D3Container")
     .attr("width", width)
     .attr("height", height)
     .attr("transform", "translate(" + offset_x + "," + offset_y + ")")
-    .call(zoom);
+    .call(zoom).on("dblclick.zoom", null)
+    .call(zoom).on("wheel.zoom", null);
 
-// DropShadows
+// DropShadows & SupraLink group container
 var defs = svg.append("defs");
 var filter_t = defs.append("filter")
       .attr("id", "dropshadow_table")
@@ -113,6 +168,7 @@ feMerge.append("feMergeNode")
   .attr("in", "offsetBlur")
 feMerge.append("feMergeNode")
   .attr("in", "SourceGraphic");
+var SupraLinkGroup = svg.append("g").attr("class", 'Supralink'); // Link Group container
 
 // Retrieve the position distributions for the tables
 const [Positions, example_data] = getTablePos(example_data_r);
@@ -199,7 +255,7 @@ var tables_cols = svg.selectAll(".table").selectAll('.columns_desc').selectAll("
 var table_header  = svg.selectAll(".table").selectAll('.header_text')._groups;
 var tables_nb = tables_cols.length;
 var nodemapper = {};
-var remainingkey = {};
+var remainingkey = [];
 var nodepair = [];
 
 // Establish the Node Pairs
@@ -210,26 +266,28 @@ for (var i = 0; i < tables_nb; i++){
         node = tables_cols[i][j];
         c_name = node.__data__.col_name;
         // Append to the dictionary mapper
-        origin_key = t_name + '.' + c_name;
-        nodemapper[origin_key] = node;
+        origin_key = t_name + '.' + c_name; // unique
+        nodemapper[origin_key] = node; // unique
         if (node.__data__.f_key.length > 0){
-            c_key = node.__data__.f_key;
+            f_key = node.__data__.f_key[0]; // NOT unique
+
             // Try to connect if target already passed
-            if (c_key in nodemapper){
-                nodepair.push([nodemapper[c_key], nodemapper[origin_key]]);
+            if (f_key in nodemapper){
+                nodepair.push([nodemapper[f_key], nodemapper[origin_key]]);
             } else {
-                remainingkey[c_key] = origin_key;
+                remainingkey.push([origin_key, f_key])
             }
         }
 
-
-        if (origin_key in remainingkey){
-            nodepair.push([nodemapper[origin_key], nodemapper[remainingkey[origin_key]]]);
-            delete remainingkey[origin_key];
+        var len_nodepair = remainingkey.length
+        for (var f = len_nodepair-1; f >= 0; f--){
+            if (origin_key == remainingkey[f][1]) // origin_key == f_key
+            {
+                nodepair.push([nodemapper[remainingkey[f][0]], nodemapper[remainingkey[f][1]]]);
+            }
         }
     }
 }
-
 var link_curve = d3.linkHorizontal()
   .x(function(d) {
     return d.x;
@@ -258,7 +316,7 @@ function lineData(target, source){
     anchor_ry = Math.round((t_rect.y - ParentDiv.y - pan_y + col_height/2)*100)/100;
 
     // check the shortest path between the two
-    if (t_rect.x <= s_rect.x){
+    if (t_rect.x < s_rect.x){
         anchor_rx = anchor_rx + table_width;
     } else {
         anchor_lx = anchor_lx + table_width;
@@ -281,8 +339,8 @@ function lineData(target, source){
 function DrawConnections(){
     for (var i = 0; i < nodepair.length; i++){
         // Group 
-        var linkgroup = svg.append("g").attr("class", "link");
-        c_color = link_colors[i];
+        var linkgroup = SupraLinkGroup.append("g").attr("class", "link");
+        c_color = link_colors[i%link_colors.length];
         // Lines 
         linkgroup.selectAll('path').data([lineData(nodepair[i][0], nodepair[i][1])])
             .enter().append("path")
@@ -291,13 +349,13 @@ function DrawConnections(){
             .attr("transform", "translate(" + width/2 + "," + height/2 + ")")
             .attr("stroke_width", 10)
             .attr("stroke", c_color)
-            .attr("marker-end", 'url(#head)')
+            .attr("marker-end", 'url(#head' + i + ')')
             .attr("filter", "url(#dropshadow_link)");
 
         linkgroup.selectAll('marker').data([lineData(nodepair[i][0], nodepair[i][1])])
             .enter().append('marker')
-            .attr("id", 'head')
-            .attr('refX', 4.5)
+            .attr("id", 'head' + i)
+            .attr('refX', SetRefX)
             .attr('refY', 4)
             .attr('markerWidth', 40)
             .attr('markerHeight', 40)
@@ -306,20 +364,15 @@ function DrawConnections(){
             .attr('class', c_color)
             .attr("d", 'M0,0 V8 L4,4 Z')
             .style("stroke", 'black');
-            // 'M 0,0 m -5,-5 L 5,0 L -5,5 Z', viewbox: '-5 -5 10 10'
 
-    //         .attr("refX", 6)
-    // .attr("refY", 6)
-    // .attr("markerWidth", 30)
-    // .attr("markerHeight", 30)
-    // .attr("markerUnits","userSpaceOnUse")
-    // .attr("orient", "auto")
-    // .append("path")
-    // .attr("d", "M 0 0 12 6 0 12 3 6")
-
-
-    //     svg.append("svg:defs").append("svg:marker")
-
+    }
+}
+function SetRefX (d) {
+    if (d.source.x < d.target.x){
+        return 10;
+    } else {
+        // console.log(2);
+        return 4.5;
     }
 }
 
@@ -338,9 +391,10 @@ function handleMouseOut(d, i){
 function showcolumntooltip(d, i){
     // put the tooltip next to the column row
     var arrow_size = 10;
+    scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     Rect = this.getBoundingClientRect();
     x_tooltip = Rect.x + table_width+arrow_size;
-    y_tooltip = Rect.y - col_height;
+    y_tooltip = Rect.y - col_height + scrollTop;
 
     tooltip.transition()		
             .duration(600)		
@@ -353,11 +407,6 @@ function showcolumntooltip(d, i){
         )	
             .style("left", (x_tooltip) + "px")		
             .style("top", (y_tooltip) + "px");	
-
-    // d3.select('.body').append('div')
-    // .attr('class', 'tooltip')
-    // .style('top', d3.event.pageY)
-    // .style('left', d3.event.pageX)
 }
 
 function closecolumntooltip(d, i){
@@ -398,14 +447,14 @@ function getTablePos(data){
     // This function returns a set of position to get the tables evenly spread
     // table with the most outgoing p_key connection is placed on the center
     // after that 
-    var byring = 4; // nb of table on each ring
+    var byring = 8; // nb of table on each ring
     var count;
     VisibleFrame = document.getElementById('D3Container').getBoundingClientRect();
 
 
     var svg_center_x = VisibleFrame.width/2 -  offset_x; 
     var svg_center_y = VisibleFrame.height/2 -  offset_y; 
-    // Order the tables in a list by number of connections
+    // #1# Order the tables in a list by number of connections
     var list_collec = [];
     for (var i = 0; i < data.length; i++){
         count = 0;
@@ -420,17 +469,31 @@ function getTablePos(data){
     list_collec.sort(function(a, b) {
         return ((a.count > b.count) ? -1 : ((a.count == b.count) ? 0 : 1));
     });
-    var rings = Math.ceil((list_collec.length - 1)/4);
+    
+    // #2# Calculate how many rings there will be and initialize the pos of the center table
+    var rings = Math.ceil((list_collec.length - 1)/byring);
     Pos = [{'x':svg_center_x, 'y':svg_center_x}];
 
-    var min_radius = list_collec[0].table.table_cols.length * col_height * 2;
+    // Table Spread parameters
+    var min_radius = 450;
+    var c_radius = list_collec[0].table.table_cols.length * col_height * 2;
+    var c_table = 0;
+    var anglespos = 3.14*2/byring;
+
     for (var r = 0; r < rings; r++){
-        anglespos = 3.14/byring;
-        for (var r_nb = 0; r_nb < byring; r_nb++){
+        if (c_table == list_collec.length){break;}
+        // if (c_table == byring){c_radius += min_radius;}
+        if (r!=0) { // check ring radius for no overlapping
+            c_radius = min_radius + list_collec[c_table].table.table_cols.length * col_height * 2;
+        };
+
+        for (var r_nb = 0; r_nb < byring; r_nb++){ 
             c_angle = anglespos*(r_nb+1);
-            p_x = min_radius*Math.cos(c_angle);
-            p_y = min_radius*Math.sin(c_angle);
+            p_x = c_radius*Math.cos(c_angle);
+            p_y = c_radius*Math.sin(c_angle);
             Pos.push({'x':svg_center_x+p_x, 'y':svg_center_x+p_y})
+            c_table += 1;
+            if (c_table == list_collec.length){break;}
         }
     }
 
@@ -439,20 +502,8 @@ function getTablePos(data){
     return [Pos, data_ordered];
 }
 
-function getTranslation(transform) {
-    // Create a dummy g for calculation purposes only. This will never
-    // be appended to the DOM and will be discarded once this function 
-    // returns.
-    var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    
-    // Set the transform attribute to the provided string value.
-    g.setAttributeNS(null, "transform", transform);
-    
-    // consolidate the SVGTransformList containing all transformations
-    // to a single SVGTransform of type SVG_TRANSFORM_MATRIX and get
-    // its SVGMatrix. 
-    var matrix = g.transform.baseVal.consolidate().matrix;
-    
-    // As per definition values e and f are the ones for the translation.
-    return [matrix.e, matrix.f];
-  }
+// -------------------------------- Position Tools ----------------------- //
+
+function SaveDiagram(){
+
+}
